@@ -160,6 +160,43 @@ const ScrollExpandMedia = ({
     return () => window.removeEventListener('resize', checkIfMobile);
   }, []);
 
+  // Allow same-page anchor links (#features, #cta, etc.) to bypass the scroll
+  // lock by first marking the hero as fully expanded, then smoothly scrolling
+  // to the target on the next paint cycle.
+  useEffect(() => {
+    const handleAnchorClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement | null;
+      const anchor = target?.closest(
+        'a[href^="#"]'
+      ) as HTMLAnchorElement | null;
+      if (!anchor) return;
+      const hash = anchor.getAttribute('href');
+      if (!hash || hash === '#') return;
+
+      e.preventDefault();
+
+      // Unlock the hero so the scroll listener stops forcing scrollY=0
+      setMediaFullyExpanded(true);
+      setShowContent(true);
+      setScrollProgress(1);
+
+      // Wait two rAFs so React commits the state and the scroll listener
+      // is re-registered with the new closure, then smooth-scroll.
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          const el = document.querySelector(hash);
+          if (el) {
+            el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            history.replaceState(null, '', hash);
+          }
+        });
+      });
+    };
+
+    document.addEventListener('click', handleAnchorClick);
+    return () => document.removeEventListener('click', handleAnchorClick);
+  }, []);
+
   const mediaWidth = 300 + scrollProgress * (isMobileState ? 650 : 1250);
   const mediaHeight = 400 + scrollProgress * (isMobileState ? 200 : 400);
   const textTranslateX = scrollProgress * (isMobileState ? 180 : 150);
