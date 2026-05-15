@@ -1,0 +1,89 @@
+@import "tailwindcss";
+
+/* =========================================================
+   NutriApp Pro — Centro Metabólico brand tokens
+   Style: Accessible & Ethical (WCAG AAA target)
+   ========================================================= */
+:root {
+  /* Brand */
+  --brand-cyan: #1DAEEC;        /* primary */
+  --brand-cyan-dark: #039CE0;   /* hover / active */
+  --brand-cyan-ink: #0B5A7A;    /* AAA text-on-light */
+  --brand-mint: #34D399;        /* CTA / "salud" accent */
+  --brand-mint-dark: #059669;   /* CTA hover */
+
+  /* Surfaces */
+  --surface-0: #F7FBFE;         /* page bg */
+  --surface-1: #FFFFFF;         /* card */
+  --surface-2: #E7F4FB;         /* subtle tint */
+  --surface-ink: #0B2A3A;       /* primary text */
+  --surface-muted: #4A6577;     /* secondary text */
+  --surface-line: #D7E6EF;      /* hairline borders */
+
+  /* Tailwind v4 default vars */
+  --background: var(--surface-0);
+  --foreground: var(--surface-ink);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-brand: var(--brand-cyan);
+  --color-brand-dark: var(--brand-cyan-dark);
+  --color-brand-ink: var(--brand-cyan-ink);
+  --color-mint: var(--brand-mint);
+  --color-mint-dark: var(--brand-mint-dark);
+  --color-surface: var(--surface-1);
+  --color-surface-tint: var(--surface-2);
+  --color-ink: var(--surface-ink);
+  --color-muted: var(--surface-muted);
+  --color-line: var(--surface-line);
+
+  --font-sans: var(--font-inter), system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Visible focus ring for keyboard nav (WCAG 2.4.7) */
+:focus-visible {
+  outline: 3px solid var(--brand-cyan);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Skip-link helper */
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  background: var(--brand-cyan-dark);
+  color: white;
+  padding: 0.75rem 1rem;
+  z-index: 100;
+  border-radius: 0 0 8px 0;
+  font-weight: 600;
+}
+.skip-link:focus {
+  left: 0;
+}
