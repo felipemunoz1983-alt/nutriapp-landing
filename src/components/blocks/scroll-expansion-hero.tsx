@@ -349,13 +349,13 @@ const ScrollExpandMedia = ({
                 }`}
               >
                 <motion.h2
-                  className='font-[family-name:var(--font-display)] uppercase tracking-tight text-6xl md:text-8xl lg:text-9xl text-white transition-none [text-shadow:0_0_20px_rgba(255,255,255,0.8),0_0_40px_rgba(255,255,255,0.55),0_0_70px_rgba(255,255,255,0.35)]'
+                  className='font-[family-name:var(--font-display)] uppercase tracking-tight text-4xl sm:text-6xl md:text-8xl lg:text-9xl text-white transition-none [text-shadow:0_0_20px_rgba(255,255,255,0.8),0_0_40px_rgba(255,255,255,0.55),0_0_70px_rgba(255,255,255,0.35)]'
                   style={{ transform: `translateX(-${textTranslateX}vw)` }}
                 >
                   {firstWord}
                 </motion.h2>
                 <motion.h2
-                  className='font-[family-name:var(--font-display)] uppercase tracking-tight text-6xl md:text-8xl lg:text-9xl text-white text-center transition-none [text-shadow:0_0_20px_rgba(255,255,255,0.8),0_0_40px_rgba(255,255,255,0.55),0_0_70px_rgba(255,255,255,0.35)]'
+                  className='font-[family-name:var(--font-display)] uppercase tracking-tight text-4xl sm:text-6xl md:text-8xl lg:text-9xl text-white text-center transition-none [text-shadow:0_0_20px_rgba(255,255,255,0.8),0_0_40px_rgba(255,255,255,0.55),0_0_70px_rgba(255,255,255,0.35)]'
                   style={{ transform: `translateX(${textTranslateX}vw)` }}
                 >
                   {restOfTitle}
