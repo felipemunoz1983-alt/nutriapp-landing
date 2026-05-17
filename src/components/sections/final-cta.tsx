@@ -1,4 +1,5 @@
 import { ArrowRight, ListChecks } from 'lucide-react';
+import TrackedAppLink from '@/components/tracked-app-link';
 
 export default function FinalCTA() {
   return (
@@ -24,15 +25,13 @@ export default function FinalCTA() {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <a
-              href="https://centro-metabolico-pro.vercel.app/login"
-              target="_blank"
-              rel="noopener noreferrer"
+            <TrackedAppLink
+              location="final-cta"
               className="inline-flex items-center justify-center gap-2 rounded-full px-7 py-3.5 text-base font-semibold bg-white text-[var(--brand-cyan-dark)] hover:bg-[var(--surface-2)] transition-colors cursor-pointer shadow-lg"
             >
               Acceder a la app
               <ArrowRight className="w-5 h-5" aria-hidden="true" />
-            </a>
+            </TrackedAppLink>
             <a
               href="#features"
               className="inline-flex items-center justify-center gap-2 rounded-full px-7 py-3.5 text-base font-semibold border-2 border-white/70 text-white hover:bg-white/10 transition-colors cursor-pointer"

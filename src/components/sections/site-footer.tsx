@@ -1,4 +1,5 @@
 import { Activity, Mail } from 'lucide-react';
+import TrackedAppLink from '@/components/tracked-app-link';
 
 // Inline Instagram glyph — lucide-react removed brand icons for trademark
 // reasons. Meta's brand guidelines permit using the official mark for linking.
@@ -52,14 +53,12 @@ export default function SiteFooter() {
             <li><a href="#diferencia" className="hover:text-[var(--brand-cyan-dark)] transition-colors">Por qué es distinta</a></li>
             <li><a href="#testimonios" className="hover:text-[var(--brand-cyan-dark)] transition-colors">Testimonios</a></li>
             <li>
-              <a
-                href="https://centro-metabolico-pro.vercel.app/login"
-                target="_blank"
-                rel="noopener noreferrer"
+              <TrackedAppLink
+                location="footer"
                 className="hover:text-[var(--brand-cyan-dark)] transition-colors"
               >
                 Acceder a la app ↗
-              </a>
+              </TrackedAppLink>
             </li>
           </ul>
         </div>

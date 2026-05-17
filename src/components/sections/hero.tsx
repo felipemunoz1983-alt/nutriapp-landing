@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 import ScrollExpandMedia from '@/components/blocks/scroll-expansion-hero';
+import TrackedAppLink from '@/components/tracked-app-link';
 
 const HERO_MEDIA = {
   // Image used inside the expanding frame: clean, clinical-warm food photo
@@ -47,15 +48,13 @@ export default function Hero() {
         </p>
 
         <div className="mt-10 flex flex-col sm:flex-row gap-3 justify-center">
-          <a
-            href="https://centro-metabolico-pro.vercel.app/login"
-            target="_blank"
-            rel="noopener noreferrer"
+          <TrackedAppLink
+            location="hero"
             className="inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-base font-medium text-white shadow-sm hover:shadow-md transition-all cursor-pointer"
             style={{ background: 'var(--brand-mint-dark)' }}
           >
             Acceder a la app
-          </a>
+          </TrackedAppLink>
           <a
             href="#como-funciona"
             className="inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-base font-medium border-2 transition-colors cursor-pointer text-[var(--brand-cyan-dark)] border-[var(--brand-cyan-dark)] hover:bg-[var(--surface-tint)]"

@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { Activity } from 'lucide-react';
+import TrackedAppLink from '@/components/tracked-app-link';
 
 export default function SiteHeader() {
   return (
@@ -38,15 +39,13 @@ export default function SiteHeader() {
           </a>
         </nav>
 
-        <a
-          href="https://centro-metabolico-pro.vercel.app/login"
-          target="_blank"
-          rel="noopener noreferrer"
+        <TrackedAppLink
+          location="header"
           className="inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium text-white transition-colors cursor-pointer"
           style={{ background: 'var(--brand-mint-dark)' }}
         >
           Acceder a la app
-        </a>
+        </TrackedAppLink>
       </div>
     </header>
   );
