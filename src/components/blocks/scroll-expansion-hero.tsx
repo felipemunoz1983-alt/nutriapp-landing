@@ -1,14 +1,18 @@
 'use client';
 
 import { useEffect, useRef, useState, type ReactNode } from 'react';
-import Image from 'next/image';
+import Image, { type StaticImageData } from 'next/image';
 import { motion } from 'framer-motion';
+
+// Image sources accept either a remote URL string or a Next.js static import
+// (StaticImageData). Video sources must be plain strings.
+type ImageSource = string | StaticImageData;
 
 interface ScrollExpandMediaProps {
   mediaType?: 'video' | 'image';
-  mediaSrc: string;
+  mediaSrc: ImageSource;
   posterSrc?: string;
-  bgImageSrc: string;
+  bgImageSrc: ImageSource;
   title?: string;
   date?: string;
   scrollToExpand?: string;
@@ -213,6 +217,11 @@ const ScrollExpandMedia = ({
   const firstWord = title ? title.split(' ')[0] : '';
   const restOfTitle = title ? title.split(' ').slice(1).join(' ') : '';
 
+  // Normalised string form of mediaSrc for the video paths (iframe / <video>),
+  // which can't consume a Next.js StaticImageData. Image paths receive
+  // mediaSrc / bgImageSrc unchanged — next/image handles both shapes.
+  const videoSrc = typeof mediaSrc === 'string' ? mediaSrc : mediaSrc.src;
+
   return (
     <div
       ref={sectionRef}
@@ -251,19 +260,19 @@ const ScrollExpandMedia = ({
                 }}
               >
                 {mediaType === 'video' ? (
-                  mediaSrc.includes('youtube.com') ? (
+                  videoSrc.includes('youtube.com') ? (
                     <div className='relative w-full h-full pointer-events-none'>
                       <iframe
                         width='100%'
                         height='100%'
                         src={
-                          mediaSrc.includes('embed')
-                            ? mediaSrc +
-                              (mediaSrc.includes('?') ? '&' : '?') +
+                          videoSrc.includes('embed')
+                            ? videoSrc +
+                              (videoSrc.includes('?') ? '&' : '?') +
                               'autoplay=1&mute=1&loop=1&controls=0&showinfo=0&rel=0&disablekb=1&modestbranding=1'
-                            : mediaSrc.replace('watch?v=', 'embed/') +
+                            : videoSrc.replace('watch?v=', 'embed/') +
                               '?autoplay=1&mute=1&loop=1&controls=0&showinfo=0&rel=0&disablekb=1&modestbranding=1&playlist=' +
-                              mediaSrc.split('v=')[1]
+                              videoSrc.split('v=')[1]
                         }
                         className='w-full h-full rounded-xl'
                         frameBorder='0'
@@ -284,7 +293,7 @@ const ScrollExpandMedia = ({
                   ) : (
                     <div className='relative w-full h-full pointer-events-none'>
                       <video
-                        src={mediaSrc}
+                        src={videoSrc}
                         poster={posterSrc}
                         autoPlay
                         muted

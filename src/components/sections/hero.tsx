@@ -3,13 +3,14 @@
 import { useEffect } from 'react';
 import ScrollExpandMedia from '@/components/blocks/scroll-expansion-hero';
 import TrackedAppLink from '@/components/tracked-app-link';
-
+// Self-hosted hero assets served from /public/hero/. Avoids the runtime
+// dependency on the Unsplash CDN that the original scaffold introduced.
+// Source photos (Unsplash License, attribution-recommended):
+//   foreground: https://unsplash.com/photos/poke-bowl  (photo-1546069901-...)
+//   background: https://unsplash.com/photos/fruit-platter (photo-1490645935967-...)
 const HERO_MEDIA = {
-  // Image used inside the expanding frame: clean, clinical-warm food photo
-  src: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?q=80&w=1280&auto=format&fit=crop',
-  // Background behind the frame: soft greens / wellness mood
-  background:
-    'https://images.unsplash.com/photo-1490645935967-10de6ba17061?q=80&w=1920&auto=format&fit=crop',
+  src: '/hero/foreground.jpg',
+  background: '/hero/background.jpg',
   title: 'Nutrición Personalizada',
   date: 'Centro Metabólico · Chile',
   scrollToExpand: 'Desliza para descubrir',
