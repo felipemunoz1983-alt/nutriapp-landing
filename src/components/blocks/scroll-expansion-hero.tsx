@@ -1,13 +1,6 @@
 'use client';
 
-import {
-  useEffect,
-  useRef,
-  useState,
-  ReactNode,
-  TouchEvent,
-  WheelEvent,
-} from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
 
@@ -34,139 +27,141 @@ const ScrollExpandMedia = ({
   textBlend,
   children,
 }: ScrollExpandMediaProps) => {
-  const [scrollProgress, setScrollProgress] = useState<number>(0);
-  const [showContent, setShowContent] = useState<boolean>(false);
-  const [mediaFullyExpanded, setMediaFullyExpanded] = useState<boolean>(false);
-  const [touchStartY, setTouchStartY] = useState<number>(0);
-  const [isMobileState, setIsMobileState] = useState<boolean>(false);
+  // React state — drives re-render of the visual layout.
+  const [scrollProgress, setScrollProgress] = useState(0);
+  const [showContent, setShowContent] = useState(false);
+  const [mediaFullyExpanded, setMediaFullyExpanded] = useState(false);
+  const [isMobileState, setIsMobileState] = useState(false);
 
+  // Refs — same source of truth, accessible from event handlers without
+  // re-registering them on every state update. This avoids the React 19
+  // "state updates during render" warnings and the listener churn that
+  // previously required the double-`requestAnimationFrame` anchor hack.
+  const scrollProgressRef = useRef(0);
+  const mediaFullyExpandedRef = useRef(false);
+  const touchStartYRef = useRef(0);
   const sectionRef = useRef<HTMLDivElement | null>(null);
 
+  // Reset everything if the media type changes (e.g. story switcher demos).
   useEffect(() => {
+    scrollProgressRef.current = 0;
+    mediaFullyExpandedRef.current = false;
+    touchStartYRef.current = 0;
     setScrollProgress(0);
     setShowContent(false);
     setMediaFullyExpanded(false);
   }, [mediaType]);
 
+  // Centralised progress writer — keeps ref and state in sync and applies
+  // the show-content / fully-expanded thresholds in one place.
+  const applyProgress = (nextProgress: number) => {
+    const clamped = Math.min(Math.max(nextProgress, 0), 1);
+    scrollProgressRef.current = clamped;
+    setScrollProgress(clamped);
+
+    if (clamped >= 1 && !mediaFullyExpandedRef.current) {
+      mediaFullyExpandedRef.current = true;
+      setMediaFullyExpanded(true);
+      setShowContent(true);
+    } else if (clamped < 0.75 && showContentRef.current) {
+      showContentRef.current = false;
+      setShowContent(false);
+    }
+  };
+
+  // Mirror showContent into a ref so applyProgress avoids redundant setState
+  // calls on every tick under 0.75.
+  const showContentRef = useRef(false);
+  useEffect(() => {
+    showContentRef.current = showContent;
+  }, [showContent]);
+
+  // Main scroll/touch listener registration. Empty deps array — registers
+  // once on mount. Handlers read mutable state from refs.
   useEffect(() => {
     const handleWheel = (e: WheelEvent) => {
-      if (mediaFullyExpanded && e.deltaY < 0 && window.scrollY <= 5) {
+      if (
+        mediaFullyExpandedRef.current &&
+        e.deltaY < 0 &&
+        window.scrollY <= 5
+      ) {
+        // Scrolling up while at the top of the page re-locks the hero so the
+        // user can re-experience the expansion animation.
+        mediaFullyExpandedRef.current = false;
         setMediaFullyExpanded(false);
         e.preventDefault();
-      } else if (!mediaFullyExpanded) {
+        return;
+      }
+      if (!mediaFullyExpandedRef.current) {
         e.preventDefault();
-        const scrollDelta = e.deltaY * 0.0009;
-        const newProgress = Math.min(
-          Math.max(scrollProgress + scrollDelta, 0),
-          1
-        );
-        setScrollProgress(newProgress);
-
-        if (newProgress >= 1) {
-          setMediaFullyExpanded(true);
-          setShowContent(true);
-        } else if (newProgress < 0.75) {
-          setShowContent(false);
-        }
+        applyProgress(scrollProgressRef.current + e.deltaY * 0.0009);
       }
     };
 
     const handleTouchStart = (e: TouchEvent) => {
-      setTouchStartY(e.touches[0].clientY);
+      touchStartYRef.current = e.touches[0].clientY;
     };
 
     const handleTouchMove = (e: TouchEvent) => {
-      if (!touchStartY) return;
-
+      if (!touchStartYRef.current) return;
       const touchY = e.touches[0].clientY;
-      const deltaY = touchStartY - touchY;
+      const deltaY = touchStartYRef.current - touchY;
 
-      if (mediaFullyExpanded && deltaY < -20 && window.scrollY <= 5) {
+      if (
+        mediaFullyExpandedRef.current &&
+        deltaY < -20 &&
+        window.scrollY <= 5
+      ) {
+        mediaFullyExpandedRef.current = false;
         setMediaFullyExpanded(false);
         e.preventDefault();
-      } else if (!mediaFullyExpanded) {
+        return;
+      }
+      if (!mediaFullyExpandedRef.current) {
         e.preventDefault();
+        // Higher sensitivity when scrolling back up so the user can re-engage
+        // the locked state without an awkward dead zone.
         const scrollFactor = deltaY < 0 ? 0.008 : 0.005;
-        const scrollDelta = deltaY * scrollFactor;
-        const newProgress = Math.min(
-          Math.max(scrollProgress + scrollDelta, 0),
-          1
-        );
-        setScrollProgress(newProgress);
-
-        if (newProgress >= 1) {
-          setMediaFullyExpanded(true);
-          setShowContent(true);
-        } else if (newProgress < 0.75) {
-          setShowContent(false);
-        }
-
-        setTouchStartY(touchY);
+        applyProgress(scrollProgressRef.current + deltaY * scrollFactor);
+        touchStartYRef.current = touchY;
       }
     };
 
-    const handleTouchEnd = (): void => {
-      setTouchStartY(0);
+    const handleTouchEnd = () => {
+      touchStartYRef.current = 0;
     };
 
-    const handleScroll = (): void => {
-      if (!mediaFullyExpanded) {
+    const handleScroll = () => {
+      // Force the page back to top while the hero is locked. Reads the ref so
+      // it always observes the live unlock state, even mid-tick.
+      if (!mediaFullyExpandedRef.current) {
         window.scrollTo(0, 0);
       }
     };
 
-    window.addEventListener('wheel', handleWheel as unknown as EventListener, {
-      passive: false,
-    });
-    window.addEventListener('scroll', handleScroll as EventListener);
-    window.addEventListener(
-      'touchstart',
-      handleTouchStart as unknown as EventListener,
-      { passive: false }
-    );
-    window.addEventListener(
-      'touchmove',
-      handleTouchMove as unknown as EventListener,
-      { passive: false }
-    );
-    window.addEventListener('touchend', handleTouchEnd as EventListener);
+    window.addEventListener('wheel', handleWheel, { passive: false });
+    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('touchstart', handleTouchStart, { passive: false });
+    window.addEventListener('touchmove', handleTouchMove, { passive: false });
+    window.addEventListener('touchend', handleTouchEnd);
 
     return () => {
-      window.removeEventListener(
-        'wheel',
-        handleWheel as unknown as EventListener
-      );
-      window.removeEventListener('scroll', handleScroll as EventListener);
-      window.removeEventListener(
-        'touchstart',
-        handleTouchStart as unknown as EventListener
-      );
-      window.removeEventListener(
-        'touchmove',
-        handleTouchMove as unknown as EventListener
-      );
-      window.removeEventListener('touchend', handleTouchEnd as EventListener);
+      window.removeEventListener('wheel', handleWheel);
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('touchstart', handleTouchStart);
+      window.removeEventListener('touchmove', handleTouchMove);
+      window.removeEventListener('touchend', handleTouchEnd);
     };
-  }, [scrollProgress, mediaFullyExpanded, touchStartY]);
-
-  useEffect(() => {
-    const checkIfMobile = (): void => {
-      setIsMobileState(window.innerWidth < 768);
-    };
-
-    checkIfMobile();
-    window.addEventListener('resize', checkIfMobile);
-
-    return () => window.removeEventListener('resize', checkIfMobile);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Allow same-page anchor links (#features, #cta, etc.) to bypass the scroll
-  // lock by first marking the hero as fully expanded, then smoothly scrolling
-  // to the target on the next paint cycle.
+  // Same-page anchor links (`#features`, `#cta`, …) need to bypass the scroll
+  // lock. Because mediaFullyExpandedRef is updated synchronously here, the
+  // handleScroll listener observes the unlock on the very next event tick —
+  // no double-rAF dance required.
   useEffect(() => {
     const handleAnchorClick = (e: MouseEvent) => {
-      const target = e.target as HTMLElement | null;
-      const anchor = target?.closest(
+      const anchor = (e.target as HTMLElement | null)?.closest(
         'a[href^="#"]'
       ) as HTMLAnchorElement | null;
       if (!anchor) return;
@@ -175,13 +170,19 @@ const ScrollExpandMedia = ({
 
       e.preventDefault();
 
-      // Unlock the hero so the scroll listener stops forcing scrollY=0
+      // Unlock the hero synchronously via the ref so the scroll listener
+      // stops forcing scrollY=0 before the browser tries to navigate.
+      scrollProgressRef.current = 1;
+      mediaFullyExpandedRef.current = true;
+      showContentRef.current = true;
+      setScrollProgress(1);
       setMediaFullyExpanded(true);
       setShowContent(true);
-      setScrollProgress(1);
 
-      // Wait two rAFs so React commits the state and the scroll listener
-      // is re-registered with the new closure, then smooth-scroll.
+      // Wait two rAFs before scrolling. The unlock changes the hero's rendered
+      // size (media expands, showContent fades in), which shifts the layout
+      // and moves every anchor target's offsetTop. Scrolling before the new
+      // layout commits would land on the old position of the target.
       requestAnimationFrame(() => {
         requestAnimationFrame(() => {
           const el = document.querySelector(hash);
@@ -195,6 +196,14 @@ const ScrollExpandMedia = ({
 
     document.addEventListener('click', handleAnchorClick);
     return () => document.removeEventListener('click', handleAnchorClick);
+  }, []);
+
+  // Mobile breakpoint detection (matches Tailwind's md:).
+  useEffect(() => {
+    const checkIfMobile = () => setIsMobileState(window.innerWidth < 768);
+    checkIfMobile();
+    window.addEventListener('resize', checkIfMobile);
+    return () => window.removeEventListener('resize', checkIfMobile);
   }, []);
 
   const mediaWidth = 300 + scrollProgress * (isMobileState ? 650 : 1250);
@@ -223,10 +232,7 @@ const ScrollExpandMedia = ({
               width={1920}
               height={1080}
               className='w-screen h-screen'
-              style={{
-                objectFit: 'cover',
-                objectPosition: 'center',
-              }}
+              style={{ objectFit: 'cover', objectPosition: 'center' }}
               priority
             />
             <div className='absolute inset-0 bg-black/35' />
@@ -268,7 +274,6 @@ const ScrollExpandMedia = ({
                         className='absolute inset-0 z-10'
                         style={{ pointerEvents: 'none' }}
                       ></div>
-
                       <motion.div
                         className='absolute inset-0 bg-black/30 rounded-xl'
                         initial={{ opacity: 0.7 }}
@@ -295,7 +300,6 @@ const ScrollExpandMedia = ({
                         className='absolute inset-0 z-10'
                         style={{ pointerEvents: 'none' }}
                       ></div>
-
                       <motion.div
                         className='absolute inset-0 bg-black/30 rounded-xl'
                         initial={{ opacity: 0.7 }}
@@ -313,7 +317,6 @@ const ScrollExpandMedia = ({
                       height={720}
                       className='w-full h-full object-cover rounded-xl'
                     />
-
                     <motion.div
                       className='absolute inset-0 bg-black/50 rounded-xl'
                       initial={{ opacity: 0.7 }}
