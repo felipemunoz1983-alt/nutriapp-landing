@@ -59,11 +59,13 @@ Vercel enables **Deployment Protection** by default on new projects, which gates
 
 If a production URL ever returns a 401 or a login page, this is the first thing to check.
 
-### GitHub auto-redeploy
+### GitHub auto-redeploy ✓
 
-The project is linked to the GitHub repo `felipemunoz1983-alt/nutriapp-landing` via the Vercel CLI (`vercel link`), **not** via the Vercel ↔ GitHub marketplace integration. As a result, `git push` does **not** trigger an automatic deploy — deploys require running `vercel --prod` locally.
+The project is connected to the GitHub repo `felipemunoz1983-alt/nutriapp-landing` via the **Vercel ↔ GitHub integration** (Settings → Git → "Connected Git Repository").
 
-To enable auto-deploy: open the project in the Vercel dashboard → Settings → Git → Connect Git Repository. After connection, every push to `main` auto-deploys and every PR gets a preview URL.
+Every push to `main` triggers an automatic production deploy. Every pull request gets an automatic preview URL. No `vercel --prod` needed for normal workflow.
+
+The CLI link remains in `.vercel/` as a fallback for emergency manual deploys.
 
 ---
 
