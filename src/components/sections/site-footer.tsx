@@ -1,4 +1,25 @@
-import { Activity, Camera, Mail } from 'lucide-react';
+import { Activity, Mail } from 'lucide-react';
+
+// Inline Instagram glyph — lucide-react removed brand icons for trademark
+// reasons. Meta's brand guidelines permit using the official mark for linking.
+function InstagramIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+      aria-hidden="true"
+    >
+      <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
+      <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+      <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
+    </svg>
+  );
+}
 
 export default function SiteFooter() {
   return (
@@ -58,9 +79,11 @@ export default function SiteFooter() {
             <li>
               <a
                 href="https://instagram.com/centrometabolico"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 hover:text-[var(--brand-cyan-dark)] transition-colors"
               >
-                <Camera className="w-4 h-4" aria-hidden="true" />
+                <InstagramIcon className="w-4 h-4" />
                 @centrometabolico
               </a>
             </li>

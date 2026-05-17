@@ -3,6 +3,13 @@
 /* =========================================================
    NutriApp Pro — Centro Metabólico brand tokens
    Style: Accessible & Ethical (WCAG AAA target)
+
+   IMPORTANT: These tokens deliberately override the generic
+   UI/UX Pro Max scaffold defaults. NutriApp Pro is a product
+   of Centro Metabólico and must use the parent brand's
+   identity (cyan #1DAEEC + Inter + Archivo Black for display).
+   Do not revert to scaffold defaults without consulting the
+   brand owner (Felipe / Centro Metabólico).
    ========================================================= */
 :root {
   /* Brand */
