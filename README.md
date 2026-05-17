@@ -100,3 +100,5 @@ The clinical copy follows non-negotiable rules from the `nutriapp-pro` skill: no
 ## Codebase map
 
 A full audit of stack, architecture, conventions, testing posture, and known concerns lives in [`.planning/codebase/`](.planning/codebase/) (7 documents, ~1300 lines). Read `CONCERNS.md` before touching the scroll-expansion hero.
+
+<!-- auto-deploy smoke test: 1779044413 -->
